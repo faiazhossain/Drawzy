@@ -26,6 +26,16 @@
     won: { emoji: "🎉" }
   };
 
+  /* Draw-screen order: closest to winning first, missed ones last. */
+  var CLOSENESS_RANK = {
+    "winner": 0,
+    "one-left": 1,
+    "very-close": 2,
+    "close": 3,
+    "active": 4,
+    "eliminated": 5
+  };
+
   /* ---------- Storage ---------- */
 
   var storage = (function () {
@@ -112,6 +122,7 @@
   /* ---------- Elements ---------- */
 
   var welcome = $("#screen-welcome");
+  var screenDraw = $("#screen-draw");
   var nav = $("#bottom-nav");
   var navBtns = $$(".nav-btn", nav);
 
@@ -649,19 +660,15 @@
     miniEmpty.hidden = state.tickets.length > 0;
     var next = new Map();
 
-    // Live tickets at the top, missed ones sink to the bottom.
-    function groupRank(t) {
-      var s = Lottery.calculateTicketState(t, state.called).status;
-      if (s === "winner") return 0;
-      if (s === "eliminated") return 2;
-      return 1;
-    }
+    // Sorted by closeness so the most interesting ticket is always the
+    // first row, even when only a row or two fits above the keypad.
+    // Ties keep the original order (Array.sort is stable).
     var ordered = state.tickets.slice().sort(function (a, b) {
-      return groupRank(a) - groupRank(b);
+      return CLOSENESS_RANK[ticketStatus(a).status] - CLOSENESS_RANK[ticketStatus(b).status];
     });
 
     ordered.forEach(function (t) {
-      var st = Lottery.calculateTicketState(t, state.called);
+      var st = ticketStatus(t);
       next.set(t.id, st.matched.slice());
 
       var li = document.createElement("li");
@@ -697,6 +704,7 @@
 
   function renderDrawScreen(popNew) {
     var hasCalls = state.called.length > 0;
+    screenDraw.classList.toggle("has-calls", hasCalls);
     ball.classList.toggle("idle", !hasCalls);
     ballDigit.textContent = hasCalls ? state.called[state.called.length - 1] : "–";
     ballCaption.textContent = hasCalls ? "Called now" : "Tap each number as it is announced";

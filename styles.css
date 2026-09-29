@@ -27,8 +27,8 @@
   --radius: 18px;
   --radius-sm: 12px;
 
-  --ball: 96px;
-  --key-h: 56px;
+  --ball: 76px;
+  --key-h: 52px;
   --pad: 16px;
 
   --font-ui: "Sora", "Segoe UI", system-ui, sans-serif;
@@ -103,7 +103,7 @@ ol, ul { list-style: none; }
   max-width: 480px;
   margin: 0 auto;
   /* Fixed stage: the app is exactly the viewport, each screen scrolls inside.
-     This keeps the draw keypad pinned in place no matter what. */
+     On the draw screen the keypad is sticky so it never moves mid-play. */
   height: 100vh;
   height: 100dvh;
   display: flex;
@@ -125,9 +125,13 @@ ol, ul { list-style: none; }
   animation: screen-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* The draw screen is a fixed stage: only the ticket list scrolls inside it,
-   so the keypad never shifts mid-play and rapid taps always land. */
-.screen-draw { overflow: hidden; }
+/* The draw screen scrolls as one page, but the keypad block is sticky, so it
+   stays pinned above the bottom nav no matter how far the list is scrolled —
+   it never shifts mid-play and rapid taps always land. */
+.screen-draw {
+  overflow-y: auto;
+  padding-bottom: 0;
+}
 
 @keyframes screen-in {
   from { opacity: 0; transform: translateY(10px); }
@@ -639,9 +643,14 @@ ol, ul { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 6px 0 2px;
+  gap: 6px;
+  padding: 2px 0 0;
 }
+
+/* Once numbers are called the caption and strip label go quiet — the ball
+   and banner already say it — freeing room for the ticket list. */
+.screen-draw.has-calls .ball-caption,
+.screen-draw.has-calls .strip-label { display: none; }
 
 .ball-wrap { position: relative; width: var(--ball); height: var(--ball); }
 
@@ -770,14 +779,11 @@ ol, ul { list-style: none; }
 
 /* Mini ticket list on draw screen */
 
+/* Grow to fill any leftover height, but never shrink below the content —
+   when the list doesn't fit, the screen scrolls under the sticky keypad. */
 .draw-tickets {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 96%);
-  mask-image: linear-gradient(180deg, #000 55%, transparent 96%);
-  padding-bottom: 10px;
+  flex: 1 0 auto;
+  padding-bottom: 4px;
 }
 
 .mini-list { display: flex; flex-direction: column; gap: 7px; }
@@ -829,7 +835,18 @@ ol, ul { list-style: none; }
 
 /* Keypad */
 
-.draw-controls { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+/* Sticky so the pad stays put while the ticket list scrolls underneath;
+   the fade blends its top edge into the scrolling list. */
+.draw-controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 12px;
+  background: linear-gradient(180deg, rgba(12, 10, 22, 0) 0, var(--bg) 22px);
+}
 
 .keypad {
   display: grid;
@@ -1182,7 +1199,6 @@ ol, ul { list-style: none; }
   .screen-draw {
     gap: 8px;
     padding-top: 10px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
   .draw-stage { gap: 5px; padding: 0; }
   .welcome-art { width: 118px; height: 118px; }
@@ -1204,7 +1220,6 @@ ol, ul { list-style: none; }
   .screen-draw {
     gap: 5px;
     padding-top: 8px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
   .live-badge { font-size: 15px; }
   .draw-head .icon-btn { width: 36px; height: 36px; }
