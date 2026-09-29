@@ -27,8 +27,8 @@
   --radius: 18px;
   --radius-sm: 12px;
 
-  --ball: 76px;
-  --key-h: 52px;
+  --ball: 64px;
+  --key-h: 46px;
   --pad: 16px;
 
   --font-ui: "Sora", "Segoe UI", system-ui, sans-serif;
@@ -130,6 +130,7 @@ ol, ul { list-style: none; }
    it never shifts mid-play and rapid taps always land. */
 .screen-draw {
   overflow-y: auto;
+  padding-top: 10px;
   padding-bottom: 0;
 }
 
@@ -308,8 +309,8 @@ ol, ul { list-style: none; }
   flex: none;
   width: 100%;
   display: flex;
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-  gap: 4px;
+  padding: 5px 8px calc(5px + env(safe-area-inset-bottom));
+  gap: 3px;
   background: rgba(14, 11, 26, 0.9);
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
@@ -318,21 +319,21 @@ ol, ul { list-style: none; }
 
 .nav-btn {
   flex: 1;
-  min-height: 46px;
+  min-height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   border-radius: 12px;
   color: var(--text-faint);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.04em;
   transition: color 0.2s, transform 0.1s;
 }
 .nav-btn:active { transform: scale(0.94); }
-.nav-btn .ic { width: 22px; height: 22px; }
+.nav-btn .ic { width: 19px; height: 19px; }
 .nav-btn[aria-current="page"] { color: var(--gold); }
 .nav-btn[aria-current="page"] .ic { filter: drop-shadow(0 0 8px rgba(255, 201, 77, 0.55)); }
 
@@ -596,22 +597,24 @@ ol, ul { list-style: none; }
 
 /* ---------- Draw screen ---------- */
 
-.screen-draw { gap: 10px; }
+.screen-draw { gap: 8px; }
 
 .draw-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding-top: 4px;
+  gap: 8px;
+  padding-top: 2px;
 }
+
+.draw-head .icon-btn { width: 40px; height: 40px; }
 
 .live-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 17px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -643,8 +646,8 @@ ol, ul { list-style: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 2px 0 0;
+  gap: 4px;
+  padding: 0;
 }
 
 /* Once numbers are called the caption and strip label go quiet — the ball
@@ -702,18 +705,18 @@ ol, ul { list-style: none; }
 .banner {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 10px 14px;
+  gap: 9px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
   background: var(--surface);
   transition: border-color 0.3s, background 0.3s;
 }
 
-.banner-emoji { font-size: 22px; line-height: 1; }
-.banner-text { display: flex; flex-direction: column; min-width: 0; }
-.banner-text strong { font-size: 14.5px; letter-spacing: 0.01em; }
-.banner-text span { font-size: 12px; color: var(--text-dim); }
+.banner-emoji { font-size: 20px; line-height: 1; }
+.banner-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.35; }
+.banner-text strong { font-size: 14px; letter-spacing: 0.01em; }
+.banner-text span { font-size: 11.5px; color: var(--text-dim); }
 
 .banner.lv-interesting { border-color: rgba(77, 195, 255, 0.4); background: rgba(77, 195, 255, 0.08); }
 .banner.lv-close { border-color: rgba(255, 159, 28, 0.45); background: rgba(255, 159, 28, 0.09); }
@@ -730,7 +733,7 @@ ol, ul { list-style: none; }
 
 /* Called strip */
 
-.strip-wrap { display: flex; flex-direction: column; gap: 5px; }
+.strip-wrap { display: flex; flex-direction: column; gap: 4px; }
 .strip-label {
   font-size: 10.5px;
   font-weight: 700;
@@ -741,9 +744,9 @@ ol, ul { list-style: none; }
 
 .strip {
   display: flex;
-  gap: 7px;
+  gap: 6px;
   overflow-x: auto;
-  min-height: 42px;
+  min-height: 34px;
   align-items: center;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
@@ -753,19 +756,19 @@ ol, ul { list-style: none; }
 
 .strip-item {
   flex: none;
-  width: 34px; height: 38px;
+  width: 30px; height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--surface);
   border: 1px solid var(--line);
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 17px;
   color: var(--text-dim);
 }
 .strip-item:first-child {
-  width: 42px; height: 46px;
-  font-size: 25px;
+  width: 36px; height: 40px;
+  font-size: 22px;
   background: linear-gradient(160deg, var(--gold), var(--gold-2));
   border-color: transparent;
   color: var(--gold-deep);
@@ -786,14 +789,14 @@ ol, ul { list-style: none; }
   padding-bottom: 4px;
 }
 
-.mini-list { display: flex; flex-direction: column; gap: 7px; }
+.mini-list { display: flex; flex-direction: column; gap: 6px; }
 
 .mini {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  padding: 7px 10px;
+  gap: 9px;
+  padding: 5px 9px;
   border-radius: var(--radius-sm);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -804,7 +807,7 @@ ol, ul { list-style: none; }
 }
 
 .mini-digits { gap: 3px; }
-.mini .td { width: 22px; height: 26px; font-size: 14px; border-radius: 7px; }
+.mini .td { width: 20px; height: 24px; font-size: 13px; border-radius: 6px; }
 
 .mini-badge {
   flex: none;
@@ -826,7 +829,7 @@ ol, ul { list-style: none; }
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px;
+  padding: 10px;
   border-radius: var(--radius-sm);
   border: 1px dashed var(--line-strong);
   color: var(--text-faint);
@@ -843,25 +846,25 @@ ol, ul { list-style: none; }
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px 0 12px;
-  background: linear-gradient(180deg, rgba(12, 10, 22, 0) 0, var(--bg) 22px);
+  gap: 6px;
+  padding: 6px 0 10px;
+  background: linear-gradient(180deg, rgba(12, 10, 22, 0) 0, var(--bg) 14px);
 }
 
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .key {
   height: var(--key-h);
-  border-radius: 16px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
   border: 1px solid var(--line);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.08s ease, border-color 0.15s, background 0.15s, color 0.15s;
 }
 .key span {
@@ -878,12 +881,25 @@ ol, ul { list-style: none; }
 }
 .key-zero { grid-column: 2; }
 
-.draw-actions-row { display: flex; gap: 8px; }
+.draw-actions-row { display: flex; gap: 6px; }
 .draw-actions-row .btn {
   flex: 1;
-  min-height: 44px;
-  padding-block: 6px;
-  font-size: 14px;
+  min-height: 40px;
+  padding-block: 4px;
+  font-size: 13px;
+}
+
+/* New draw lights up gold once every ticket has missed — the obvious
+   next move is starting over. Undoing the missing digit clears it. */
+.draw-actions-row .btn-ghost.cta {
+  background: linear-gradient(160deg, var(--gold), var(--gold-2));
+  border-color: transparent;
+  color: var(--gold-deep);
+  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  animation: cta-glow 1.6s ease-in-out infinite;
+}
+@keyframes cta-glow {
+  50% { box-shadow: 0 6px 26px rgba(255, 159, 28, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
 }
 
 /* ---------- History ---------- */
@@ -1194,48 +1210,38 @@ ol, ul { list-style: none; }
 /* ---------- Short screens (keep the whole draw stage on one screen) ---------- */
 
 @media (max-height: 700px) {
-  :root { --ball: 72px; --key-h: 48px; }
+  :root { --ball: 56px; --key-h: 40px; }
   .screen { gap: 8px; }
-  .screen-draw {
-    gap: 8px;
-    padding-top: 10px;
-  }
-  .draw-stage { gap: 5px; padding: 0; }
   .welcome-art { width: 118px; height: 118px; }
   .welcome-ball { font-size: 44px; }
   .welcome-inner { gap: 13px; }
-  .keypad { gap: 6px; }
-  .draw-actions-row .btn { min-height: 40px; }
   .ball-caption { font-size: 10.5px; }
-  .strip { min-height: 36px; }
-  .strip-item:first-child { height: 42px; }
-  .banner { padding: 8px 12px; }
+  .strip { min-height: 30px; }
+  .strip-item:first-child { height: 34px; }
   .banner-text { line-height: 1.3; }
-  .live-badge { font-size: 17px; }
-  .draw-head .icon-btn { width: 40px; height: 40px; }
 }
 
 @media (max-height: 600px) {
-  :root { --ball: 54px; --key-h: 45px; }
+  :root { --ball: 46px; --key-h: 36px; }
   .screen-draw {
     gap: 5px;
     padding-top: 8px;
   }
-  .live-badge { font-size: 15px; }
   .draw-head .icon-btn { width: 36px; height: 36px; }
-  .draw-stage { gap: 4px; padding: 0; }
-  .banner { padding: 6px 11px; }
-  .banner-emoji { font-size: 18px; line-height: 1; }
+  .banner { padding: 5px 10px; }
+  .banner-emoji { font-size: 16px; line-height: 1; }
   .banner-text { line-height: 1.25; }
-  .banner-text strong { font-size: 13.5px; }
+  .banner-text strong { font-size: 13px; }
   .banner-text span { font-size: 11px; }
   .strip-label { font-size: 9.5px; line-height: 1.3; }
-  .strip { min-height: 30px; }
-  .strip-item { width: 28px; height: 30px; font-size: 15px; border-radius: 8px; }
-  .strip-item:first-child { width: 32px; height: 34px; font-size: 19px; }
-  .draw-actions-row .btn { min-height: 36px; padding-block: 4px; font-size: 13px; }
+  .strip { min-height: 26px; }
+  .strip-item { width: 26px; height: 28px; font-size: 14px; border-radius: 8px; }
+  .strip-item:first-child { width: 30px; height: 32px; font-size: 18px; }
+  .draw-actions-row .btn { min-height: 34px; padding-block: 3px; font-size: 12.5px; }
   .ball-caption { font-size: 9.5px; letter-spacing: 0.12em; }
   .keypad { gap: 5px; }
+  .mini { padding: 4px 8px; }
+  .mini .td { width: 18px; height: 22px; font-size: 12px; border-radius: 6px; }
 }
 
 /* ---------- Reduced motion ---------- */

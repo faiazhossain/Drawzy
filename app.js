@@ -634,6 +634,15 @@
     }
 
     banner.className = "banner lv-" + sum.level;
+
+    // Every ticket has missed and nothing is left to play for — light up
+    // "New draw" as the next move. Undoing the missing digit clears it.
+    btnNewDraw.classList.toggle(
+      "cta",
+      state.called.length > 0 &&
+      sum.total > 0 &&
+      sum.eliminated === sum.total
+    );
   }
 
   function renderStrip() {
