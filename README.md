@@ -30,8 +30,9 @@ test/        rules tests (node --test test/)
 ## Changing the lottery rules
 
 All matching behavior lives in `lottery.js` → `calculateTicketState()`.
-Current rule: a digit counts once called (position-independent); a ticket wins
-when every one of its digits has been called. Adjust there — the UI picks it up.
+Current rule: each announced digit marks one occurrence on the ticket —
+`131313` needs three 1s and three 3s (e.g. calls `1,3,1,3,1,3`). Adjust
+there — the UI picks it up.
 
 ## Local run
 

@@ -874,7 +874,7 @@
       return { id: uid(), num: num };
     });
     if (v === "fresh") state.called = [];
-    else if (v === "win") state.called = ["1", "6", "4", "2", "3", "7", "8"];
+    else if (v === "win") state.called = ["4", "8", "1", "6", "2", "3"]; // completes 481623
     else state.called = ["1", "6", "4", "2", "3", "7"];
   }
 

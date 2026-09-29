@@ -20,13 +20,27 @@
     return "active";
   }
 
-  /* Core rule: a digit counts as matched once it has been called at all
-     (position does not matter). A ticket wins when every one of its digits
-     has been called. */
+  /* Core rule: each called digit marks ONE occurrence on the ticket.
+     A ticket digit is matched when enough copies of it have been called —
+     so 131313 needs three 1s and three 3s (e.g. calls 1,3,1,3,1,3),
+     not just one of each. Matched flags fill the first occurrences of
+     each digit, left to right. */
   function calculateTicketState(ticket, calledDigits) {
-    var called = new Set(calledDigits || []);
+    var counts = {};
+    var called = calledDigits || [];
+    for (var i = 0; i < called.length; i++) {
+      counts[called[i]] = (counts[called[i]] || 0) + 1;
+    }
+    var used = {};
     var digits = String(ticket.num).split("");
-    var matched = digits.map(function (d) { return called.has(d); });
+    var matched = digits.map(function (d) {
+      var u = used[d] || 0;
+      if (u < (counts[d] || 0)) {
+        used[d] = u + 1;
+        return true;
+      }
+      return false;
+    });
     var matchedCount = matched.reduce(function (n, m) { return n + (m ? 1 : 0); }, 0);
     var remaining = digits.length - matchedCount;
     return {

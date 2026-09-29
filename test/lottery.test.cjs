@@ -3,45 +3,64 @@ const test = require("node:test");
 const assert = require("node:assert");
 const Lottery = require("../lottery.js");
 
-test("spec scenario: 161648 wins after 1,6,1,4,8", () => {
-  const ticket = { num: "161648" };
-  const called = ["1", "6", "1", "4", "8"];
-  const st = Lottery.calculateTicketState(ticket, called);
-  assert.equal(st.status, "winner");
-  assert.equal(st.remaining, 0);
-  assert.equal(st.matchedCount, 6);
+test("user scenario: 131313 must NOT win after 1,3 — needs all six digits", () => {
+  const ticket = { num: "131313" };
+  const two = Lottery.calculateTicketState(ticket, ["1", "3"]);
+  assert.equal(two.matchedCount, 2);
+  assert.equal(two.remaining, 4);
+  assert.equal(two.status, "active");
+
+  // typing the full ticket completes it
+  const six = Lottery.calculateTicketState(ticket, ["1", "3", "1", "3", "1", "3"]);
+  assert.equal(six.status, "winner");
+
+  // three 1s and three 3s in any order still mark every occurrence
+  const reordered = Lottery.calculateTicketState(ticket, ["3", "1", "1", "3", "3", "1"]);
+  assert.equal(reordered.status, "winner");
 });
 
-test("partial matches and status tiers (set-based)", () => {
+test("161648 wins when its six digits have been called", () => {
+  const ticket = { num: "161648" };
+  const st = Lottery.calculateTicketState(ticket, ["1", "6", "1", "6", "4", "8"]);
+  assert.equal(st.status, "winner");
+  assert.equal(st.remaining, 0);
+
+  // a single 6 is not enough — the repeated digit needs a second call
+  const almost = Lottery.calculateTicketState(ticket, ["1", "6", "1", "4", "8"]);
+  assert.equal(almost.status, "one-left");
+  assert.equal(almost.remaining, 1);
+});
+
+test("partial matches and status tiers (occurrence-based)", () => {
   const ticket = { num: "161648" };
   const s0 = Lottery.calculateTicketState(ticket, []);
   assert.equal(s0.status, "active");
   assert.equal(s0.matchedCount, 0);
 
-  // {1} called -> positions 0,2 match
-  const s1 = Lottery.calculateTicketState(ticket, ["1"]);
-  assert.equal(s1.matchedCount, 2);
-  assert.equal(s1.status, "active");
+  const s2 = Lottery.calculateTicketState(ticket, ["1", "6"]);
+  assert.equal(s2.matchedCount, 2);
+  assert.equal(s2.status, "active");
 
-  // {1,4} called -> 3 matched, 3 remaining
-  const s3 = Lottery.calculateTicketState(ticket, ["1", "4"]);
+  const s3 = Lottery.calculateTicketState(ticket, ["1", "6", "1"]);
   assert.equal(s3.matchedCount, 3);
   assert.equal(s3.status, "close");
 
-  // {1,6} called -> 4 matched, 2 remaining
-  const s4 = Lottery.calculateTicketState(ticket, ["1", "6"]);
+  const s4 = Lottery.calculateTicketState(ticket, ["1", "6", "1", "6"]);
   assert.equal(s4.status, "very-close");
 
-  // {1,6,4} -> 5 matched
-  const s5 = Lottery.calculateTicketState(ticket, ["1", "6", "4"]);
+  const s5 = Lottery.calculateTicketState(ticket, ["1", "6", "1", "6", "4"]);
   assert.equal(s5.status, "one-left");
   assert.equal(s5.remaining, 1);
 });
 
-test("digit position does not matter, duplicates in calls are fine", () => {
+test("repeated ticket digits need repeated calls", () => {
   const st = Lottery.calculateTicketState({ num: "999111" }, ["9", "9", "1"]);
-  assert.equal(st.matchedCount, 6);
-  assert.equal(st.status, "winner");
+  assert.equal(st.matchedCount, 3);
+  assert.equal(st.status, "close"); // 3 occurrences still unmarked
+
+  const done = Lottery.calculateTicketState({ num: "999111" }, ["9", "9", "9", "1", "1", "1"]);
+  assert.equal(done.matchedCount, 6);
+  assert.equal(done.status, "winner");
 });
 
 test("summarize levels follow alive-ticket counts", () => {
