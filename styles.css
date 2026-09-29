@@ -533,6 +533,15 @@ ol, ul { list-style: none; }
   background: linear-gradient(160deg, var(--gold), var(--gold-2));
 }
 
+.ticket-card.status-eliminated { opacity: 0.55; }
+.ticket-card.status-eliminated .badge { background: var(--surface-2); color: var(--text-faint); }
+
+.td.miss {
+  background: rgba(255, 93, 93, 0.16);
+  border-color: rgba(255, 93, 93, 0.45);
+  color: #ff9c9c;
+}
+
 .ticket-actions { display: flex; flex-direction: column; gap: 4px; }
 .ticket-actions .icon-btn { width: 38px; height: 38px; border-radius: 11px; color: var(--text-faint); }
 .ticket-actions .icon-btn:hover { color: var(--text); }
@@ -803,6 +812,8 @@ ol, ul { list-style: none; }
 .mini.status-very-close .mini-badge { color: #ff8a5c; }
 .mini.status-one-left .mini-badge { color: var(--pink); animation: badge-pulse 1.4s ease infinite; }
 .mini.status-winner .mini-badge { color: var(--gold); }
+.mini.status-eliminated { opacity: 0.5; }
+.mini.status-eliminated .mini-badge { color: var(--text-faint); }
 
 .mini-empty {
   display: flex;

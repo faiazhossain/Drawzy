@@ -30,9 +30,11 @@ test/        rules tests (node --test test/)
 ## Changing the lottery rules
 
 All matching behavior lives in `lottery.js` → `calculateTicketState()`.
-Current rule: each announced digit marks one occurrence on the ticket —
-`131313` needs three 1s and three 3s (e.g. calls `1,3,1,3,1,3`). Adjust
-there — the UI picks it up.
+Current rule: the announced digits spell out the winning number one digit at
+a time. A ticket stays alive only while the calls match its digits in order
+from the start; the first mismatch marks it **Missed**, and matching the full
+length wins. E.g. ticket `123`: calls `1,2,4` → missed; `1,2,3` → won.
+Adjust there — the UI picks it up.
 
 ## Local run
 

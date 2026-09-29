@@ -20,55 +20,65 @@
     return "active";
   }
 
-  /* Core rule: each called digit marks ONE occurrence on the ticket.
-     A ticket digit is matched when enough copies of it have been called —
-     so 131313 needs three 1s and three 3s (e.g. calls 1,3,1,3,1,3),
-     not just one of each. Matched flags fill the first occurrences of
-     each digit, left to right. */
+  /* Core rule: the announced digits spell out the winning number, one digit
+     at a time. A ticket stays alive only while the called sequence matches
+     its digits in order, from the very first call. The first mismatch marks
+     it as eliminated ("missed") — extra calls can never revive it. A ticket
+     wins when the sequence reaches its full length still matching.
+     matched[] flags fill the correct prefix; missedAt is the position where
+     the draw diverged (-1 while alive). */
   function calculateTicketState(ticket, calledDigits) {
-    var counts = {};
     var called = calledDigits || [];
-    for (var i = 0; i < called.length; i++) {
-      counts[called[i]] = (counts[called[i]] || 0) + 1;
-    }
-    var used = {};
     var digits = String(ticket.num).split("");
-    var matched = digits.map(function (d) {
-      var u = used[d] || 0;
-      if (u < (counts[d] || 0)) {
-        used[d] = u + 1;
-        return true;
+    var matchedCount = 0;
+    var missedAt = -1;
+    for (var i = 0; i < called.length; i++) {
+      if (i >= digits.length) break; // already fully matched — a winner
+      if (String(called[i]) === digits[i]) {
+        matchedCount++;
+      } else {
+        missedAt = i;
+        break;
       }
-      return false;
-    });
-    var matchedCount = matched.reduce(function (n, m) { return n + (m ? 1 : 0); }, 0);
+    }
+    var eliminated = missedAt !== -1;
     var remaining = digits.length - matchedCount;
+    var matched = digits.map(function (d, i) { return i < matchedCount; });
     return {
       digits: digits,
       matched: matched,
       matchedCount: matchedCount,
       remaining: remaining,
-      status: statusFor(remaining),
-      eliminated: false
+      missedAt: missedAt,
+      status: eliminated ? "eliminated" : statusFor(remaining),
+      eliminated: eliminated
     };
   }
 
-  /* Excitement level for the banner, driven by how many tickets are still alive.
-     Before the first number is called the draw is always neutral, so a small
-     ticket list doesn't look "interesting" before anything has happened. */
+  /* Excitement level for the banner, driven by how many tickets are still
+     alive (alive = still matching the sequence, not yet won or missed).
+     Before the first number is called the draw is always neutral. */
   function summarize(tickets, calledDigits) {
     var states = (tickets || []).map(function (t) {
       return calculateTicketState(t, calledDigits);
     });
     var winners = states.filter(function (s) { return s.status === "winner"; }).length;
-    var alive = states.length - winners;
+    var eliminated = states.filter(function (s) { return s.status === "eliminated"; }).length;
+    var alive = states.length - winners - eliminated;
     var drawStarted = (calledDigits || []).length > 0;
     var level = "neutral";
     if (states.length && winners > 0) level = "won";
     else if (drawStarted && alive === 1) level = "one-ticket";
     else if (drawStarted && alive >= 2 && alive <= 4) level = "close";
     else if (drawStarted && alive >= 5 && alive <= 9) level = "interesting";
-    return { total: states.length, winners: winners, alive: alive, level: level, states: states };
+    return {
+      total: states.length,
+      winners: winners,
+      eliminated: eliminated,
+      alive: alive,
+      level: level,
+      states: states
+    };
   }
 
   function normalizeNumber(raw) {

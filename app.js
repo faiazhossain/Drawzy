@@ -15,7 +15,7 @@
     "very-close": { label: "Very Close", emoji: "🚨" },
     "one-left": { label: "ONE LEFT", emoji: "👀" },
     "winner": { label: "Winner", emoji: "🏆" },
-    "eliminated": { label: "Eliminated", emoji: "" }
+    "eliminated": { label: "Missed", emoji: "✕" }
   };
 
   var BANNER_META = {
@@ -286,13 +286,13 @@
     return (meta.emoji ? meta.emoji + " " : "") + meta.label;
   }
 
-  function buildDigits(num, matched) {
+  function buildDigits(num, matched, missedAt) {
     var wrap = document.createElement("span");
     wrap.className = "ticket-digits";
     wrap.setAttribute("aria-hidden", "true");
     String(num).split("").forEach(function (d, i) {
       var tile = document.createElement("span");
-      tile.className = "td" + (matched[i] ? " hit" : "");
+      tile.className = "td" + (matched[i] ? " hit" : i === missedAt ? " miss" : "");
       tile.textContent = d;
       wrap.appendChild(tile);
     });
@@ -300,6 +300,10 @@
   }
 
   function ariaFor(ticket, st) {
+    if (st.status === "eliminated") {
+      return "Ticket " + ticket.num + ": missed after " + st.matchedCount +
+        " digits, out of the draw";
+    }
     return "Ticket " + ticket.num + ": " + st.matchedCount + " of " +
       st.digits.length + " matched, " + (STATUS_META[st.status] || STATUS_META.active).label;
   }
@@ -311,11 +315,16 @@
     btnStartDraw.disabled = state.tickets.length === 0;
     ticketList.textContent = "";
 
-    // Winners first so the moment is unmissable, otherwise insertion order.
+    // Winners on top, then live tickets, missed ones at the bottom —
+    // each group keeps its original order.
+    function groupRank(t) {
+      var s = ticketStatus(t).status;
+      if (s === "winner") return 0;
+      if (s === "eliminated") return 2;
+      return 1;
+    }
     var ordered = state.tickets.slice().sort(function (a, b) {
-      var aw = ticketStatus(a).status === "winner" ? 0 : 1;
-      var bw = ticketStatus(b).status === "winner" ? 0 : 1;
-      return aw - bw;
+      return groupRank(a) - groupRank(b);
     });
 
     ordered.forEach(function (t) {
@@ -327,7 +336,7 @@
 
       var main = document.createElement("div");
       main.className = "ticket-main";
-      main.appendChild(buildDigits(t.num, st.matched));
+      main.appendChild(buildDigits(t.num, st.matched, st.missedAt));
 
       var meta = document.createElement("div");
       meta.className = "ticket-meta";
@@ -592,9 +601,13 @@
       bannerTitle.textContent = "YOU WON!";
       bannerSub.textContent = plural(sum.winners, "winning ticket") + " · " +
         plural(sum.alive, "ticket") + " still alive";
+    } else if (sum.alive === 0 && sum.eliminated > 0) {
+      bannerEmoji.textContent = "💔";
+      bannerTitle.textContent = "All tickets missed";
+      bannerSub.textContent = "The draw went another way — undo a number if it was mis-entered";
     } else if (sum.level === "one-ticket") {
       bannerTitle.textContent = "ONE TICKET LEFT!";
-      bannerSub.textContent = "Every digit except one is called";
+      bannerSub.textContent = "One ticket still matches the draw";
     } else if (sum.level === "close") {
       bannerTitle.textContent = "YOU'RE GETTING CLOSE!";
       bannerSub.textContent = plural(sum.alive, "ticket") + " still alive";
@@ -635,7 +648,18 @@
     miniEmpty.hidden = state.tickets.length > 0;
     var next = new Map();
 
-    state.tickets.forEach(function (t) {
+    // Live tickets at the top, missed ones sink to the bottom.
+    function groupRank(t) {
+      var s = Lottery.calculateTicketState(t, state.called).status;
+      if (s === "winner") return 0;
+      if (s === "eliminated") return 2;
+      return 1;
+    }
+    var ordered = state.tickets.slice().sort(function (a, b) {
+      return groupRank(a) - groupRank(b);
+    });
+
+    ordered.forEach(function (t) {
       var st = Lottery.calculateTicketState(t, state.called);
       next.set(t.id, st.matched.slice());
 
@@ -648,7 +672,7 @@
       digits.setAttribute("aria-hidden", "true");
       st.digits.forEach(function (d, i) {
         var tile = document.createElement("span");
-        tile.className = "td" + (st.matched[i] ? " hit" : "");
+        tile.className = "td" + (st.matched[i] ? " hit" : i === st.missedAt ? " miss" : "");
         tile.textContent = d;
         if (popNew && st.matched[i]) {
           var before = prevMatched.get(t.id);
@@ -712,7 +736,11 @@
     if (!$("#screen-history").hidden) renderHistoryScreen();
     renderMoreStats();
 
-    if (after.level !== before.level && after.level === "close") {
+    if (after.eliminated > before.eliminated) {
+      // Tickets just dropped out — one soft note regardless of how many.
+      FX.audio.miss();
+      buzz(18);
+    } else if (after.level !== before.level && after.level === "close") {
       FX.audio.close();
       buzz([30, 40, 30]);
     } else if (after.level !== before.level && after.level === "one-ticket") {
@@ -749,7 +777,7 @@
       label.textContent = "🏆 Winning ticket";
       card.appendChild(label);
       var allMatched = t.num.split("").map(function () { return true; });
-      card.appendChild(buildDigits(t.num, allMatched));
+      card.appendChild(buildDigits(t.num, allMatched, -1));
       winnerTickets.appendChild(card);
     });
     winnerSub.textContent = winners.length === 1
@@ -874,8 +902,8 @@
       return { id: uid(), num: num };
     });
     if (v === "fresh") state.called = [];
-    else if (v === "win") state.called = ["4", "8", "1", "6", "2", "3"]; // completes 481623
-    else state.called = ["1", "6", "4", "2", "3", "7"];
+    else if (v === "win") state.called = ["1", "6", "1", "6", "4", "8"]; // spells 161648
+    else state.called = ["1", "6", "1"]; // 161648 still alive, the rest missed
   }
 
   /* ---------- Events ---------- */
