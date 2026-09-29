@@ -134,6 +134,13 @@ ol, ul { list-style: none; }
   padding-bottom: 0;
 }
 
+/* Tickets and history end with a sticky footer, so their bottom padding
+   moves onto the footer itself and the pinned bar sits flush. */
+.screen-tickets,
+.screen-history { padding-bottom: 0; }
+
+.screen-tickets { gap: 10px; }
+
 @keyframes screen-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
@@ -154,12 +161,12 @@ ol, ul { list-style: none; }
   align-items: flex-end;
   justify-content: space-between;
   gap: 10px;
-  padding-top: 6px;
+  padding-top: 4px;
 }
 
 .screen-head h2 {
   font-family: var(--font-display);
-  font-size: clamp(26px, 7.4vw, 34px);
+  font-size: clamp(24px, 7vw, 30px);
   font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1.05;
@@ -168,7 +175,7 @@ ol, ul { list-style: none; }
 
 .count-chip {
   min-width: 34px;
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
   background: var(--gold);
   color: var(--gold-deep);
@@ -184,11 +191,11 @@ ol, ul { list-style: none; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 12px 20px;
+  min-height: 44px;
+  padding: 10px 18px;
   border-radius: 999px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s;
 }
 .btn:active { transform: scale(0.96); }
@@ -211,9 +218,9 @@ ol, ul { list-style: none; }
   background: rgba(255, 93, 93, 0.08);
   border: 1px solid rgba(255, 93, 93, 0.28);
   color: var(--red);
-  min-height: 44px;
-  font-size: 14px;
-  padding: 10px 16px;
+  min-height: 40px;
+  font-size: 13px;
+  padding: 8px 14px;
 }
 .btn-danger-ghost.armed {
   background: var(--red);
@@ -223,8 +230,8 @@ ol, ul { list-style: none; }
 
 .btn-xl {
   width: 100%;
-  min-height: 56px;
-  font-size: 16px;
+  min-height: 50px;
+  font-size: 15px;
 }
 
 .btn:disabled { opacity: 0.4; pointer-events: none; }
@@ -248,7 +255,7 @@ ol, ul { list-style: none; }
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 44px;
+  min-height: 40px;
   color: var(--gold);
   font-weight: 600;
   font-size: 14px;
@@ -264,14 +271,14 @@ ol, ul { list-style: none; }
 
 .field {
   width: 100%;
-  min-height: 52px;
-  padding: 12px 16px;
+  min-height: 48px;
+  padding: 11px 16px;
   border-radius: var(--radius-sm);
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--line-strong);
   color: var(--text);
   font: inherit;
-  font-size: 16px;
+  font-size: 16px; /* 16px+: iOS zooms into smaller focused inputs */
   letter-spacing: 0.06em;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -281,7 +288,7 @@ ol, ul { list-style: none; }
   border-color: var(--gold);
   box-shadow: 0 0 0 3px rgba(255, 201, 77, 0.18);
 }
-.field.textarea { min-height: 120px; resize: vertical; line-height: 1.7; }
+.field.textarea { min-height: 104px; resize: vertical; line-height: 1.7; }
 
 .field-label {
   display: block;
@@ -408,7 +415,7 @@ ol, ul { list-style: none; }
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 14px;
 }
 
 .add-row { display: flex; gap: 10px; }
@@ -426,7 +433,7 @@ ol, ul { list-style: none; }
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  max-height: 132px;
+  max-height: 120px;
   overflow-y: auto;
 }
 
@@ -449,13 +456,13 @@ ol, ul { list-style: none; }
 
 /* ---------- Ticket cards ---------- */
 
-.ticket-list { display: flex; flex-direction: column; gap: 10px; }
+.ticket-list { display: flex; flex-direction: column; gap: 8px; }
 
 .ticket-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 13px 14px;
+  padding: 11px 12px;
   border-radius: var(--radius);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -486,14 +493,14 @@ ol, ul { list-style: none; }
 }
 
 .td {
-  width: 27px; height: 32px;
+  width: 25px; height: 30px;
   display: grid;
   place-items: center;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.32);
   border: 1px solid var(--line);
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 16px;
   color: var(--text-dim);
   transition: background 0.25s, color 0.25s, border-color 0.25s;
 }
@@ -513,11 +520,11 @@ ol, ul { list-style: none; }
 .ticket-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .badge {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 4px 9px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: var(--surface-2);
   color: var(--text-dim);
@@ -552,8 +559,8 @@ ol, ul { list-style: none; }
 .ticket-actions .icon-btn:hover { color: var(--text); }
 
 .ticket-card .edit-row { display: flex; gap: 8px; width: 100%; }
-.ticket-card .edit-row .field { min-height: 44px; padding-block: 8px; flex: 1; min-width: 0; }
-.ticket-card .edit-row .btn { min-height: 44px; padding-inline: 16px; }
+.ticket-card .edit-row .field { min-height: 40px; padding-block: 8px; flex: 1; min-width: 0; }
+.ticket-card .edit-row .btn { min-height: 40px; padding-inline: 16px; }
 
 /* ---------- Empty states ---------- */
 
@@ -563,7 +570,7 @@ ol, ul { list-style: none; }
   align-items: center;
   gap: 6px;
   text-align: center;
-  padding: 34px 18px;
+  padding: 26px 16px;
   color: var(--text-dim);
 }
 
@@ -587,11 +594,15 @@ ol, ul { list-style: none; }
 .empty .btn { margin-top: 12px; }
 
 .screen-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   margin-top: auto;
-  padding-top: 6px;
+  padding: 8px 0 14px;
+  background: linear-gradient(180deg, rgba(12, 10, 22, 0) 0, var(--bg) 14px);
 }
 .screen-footer .btn-xl { flex: 1; width: auto; }
 
@@ -766,7 +777,7 @@ ol, ul { list-style: none; }
   font-size: 17px;
   color: var(--text-dim);
 }
-.strip-item:first-child {
+.strip-item:last-child {
   width: 36px; height: 40px;
   font-size: 22px;
   background: linear-gradient(160deg, var(--gold), var(--gold-2));
@@ -775,8 +786,8 @@ ol, ul { list-style: none; }
   box-shadow: 0 4px 18px rgba(255, 159, 28, 0.35);
   animation: chip-in 0.25s ease;
 }
-.strip-item:nth-child(n + 7) { opacity: 0.55; }
-.strip-item:nth-child(n + 12) { opacity: 0.3; }
+.strip-item:nth-last-child(n + 7) { opacity: 0.55; }
+.strip-item:nth-last-child(n + 12) { opacity: 0.3; }
 
 .strip-placeholder { font-size: 13px; color: var(--text-faint); }
 

@@ -654,14 +654,16 @@
       strip.appendChild(ph);
       return;
     }
-    var recent = state.called.slice(-16).reverse();
-    recent.forEach(function (d) {
+    // Call order, left to right — the strip spells out the number like the
+    // announcement. Latest call sits at the end, highlighted; keep it in view.
+    state.called.slice(-16).forEach(function (d) {
       var li = document.createElement("li");
       li.className = "strip-item";
       li.setAttribute("aria-hidden", "true");
       li.textContent = d;
       strip.appendChild(li);
     });
+    strip.scrollLeft = strip.scrollWidth;
   }
 
   function renderMiniList(popNew) {
