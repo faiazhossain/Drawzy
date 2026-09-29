@@ -57,6 +57,7 @@
       call: function (digit) { play([[420 + digit * 34, 0, 0.09, "square", 0.16]]); },
       error: function () { play([[150, 0, 0.16, "sawtooth", 0.2]]); },
       miss: function () { play([[330, 0, 0.1, "sine", 0.14], [220, 0.09, 0.14, "sine", 0.14]]); },
+      clear: function () { play([[500, 0, 0.07, "sine", 0.14], [380, 0.08, 0.1, "sine", 0.14]]); },
       close: function () { play([[660, 0, 0.09], [880, 0.1, 0.14]]); },
       oneLeft: function () { play([[660, 0, 0.08], [880, 0.09, 0.08], [1046, 0.18, 0.16]]); },
       win: function () {

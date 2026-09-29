@@ -37,6 +37,14 @@ test("131313: alive while the sequence matches in order", () => {
   assert.equal(Lottery.calculateTicketState(t, ["1", "1"]).status, "eliminated");
 });
 
+test("short tickets look Active before the draw starts, not Close", () => {
+  // remaining 3 of 3 with nothing called is not "Getting Close"
+  assert.equal(Lottery.calculateTicketState({ num: "123" }, []).status, "active");
+  assert.equal(Lottery.calculateTicketState({ num: "123456" }, []).status, "active");
+  // but once matching begins the tiers kick in
+  assert.equal(Lottery.calculateTicketState({ num: "123" }, ["1"]).status, "very-close");
+});
+
 test("161648 wins only on the exact sequence", () => {
   const win = Lottery.calculateTicketState({ num: "161648" }, ["1", "6", "1", "6", "4", "8"]);
   assert.equal(win.status, "winner");
@@ -47,9 +55,20 @@ test("161648 wins only on the exact sequence", () => {
   assert.equal(off.missedAt, 3);
 });
 
-test("a finished ticket stays a winner no matter what is called after", () => {
-  const st = Lottery.calculateTicketState({ num: "123" }, ["1", "2", "3", "9"]);
-  assert.equal(st.status, "winner");
+test("a ticket stops winning once the draw continues past it", () => {
+  // 123 announced -> 123 is the winner
+  const atThree = Lottery.calculateTicketState({ num: "123" }, ["1", "2", "3"]);
+  assert.equal(atThree.status, "winner");
+
+  // the draw continues to 1234 -> 123 is NOT the winning number
+  const pastIt = Lottery.calculateTicketState({ num: "123" }, ["1", "2", "3", "4"]);
+  assert.equal(pastIt.status, "eliminated");
+
+  // 1234 itself wins on the four calls
+  assert.equal(
+    Lottery.calculateTicketState({ num: "1234" }, ["1", "2", "3", "4"]).status,
+    "winner"
+  );
 });
 
 test("summarize: alive counts only tickets still matching the sequence", () => {

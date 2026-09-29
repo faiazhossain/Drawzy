@@ -21,19 +21,22 @@
   }
 
   /* Core rule: the announced digits spell out the winning number, one digit
-     at a time. A ticket stays alive only while the called sequence matches
-     its digits in order, from the very first call. The first mismatch marks
-     it as eliminated ("missed") — extra calls can never revive it. A ticket
-     wins when the sequence reaches its full length still matching.
+     at a time. A ticket is the winner only while it equals the ENTIRE called
+     sequence — same length, digit for digit. The first mismatch marks it
+     eliminated ("missed"), and so does the draw continuing past its length:
+     a 123 ticket is not the winner when the number announced is 1234.
      matched[] flags fill the correct prefix; missedAt is the position where
-     the draw diverged (-1 while alive). */
+     it went out (-1 while alive and not yet fully matched). */
   function calculateTicketState(ticket, calledDigits) {
     var called = calledDigits || [];
     var digits = String(ticket.num).split("");
     var matchedCount = 0;
     var missedAt = -1;
     for (var i = 0; i < called.length; i++) {
-      if (i >= digits.length) break; // already fully matched — a winner
+      if (i >= digits.length) {
+        missedAt = i; // the draw continued past this number — not the winner
+        break;
+      }
       if (String(called[i]) === digits[i]) {
         matchedCount++;
       } else {
@@ -50,7 +53,9 @@
       matchedCount: matchedCount,
       remaining: remaining,
       missedAt: missedAt,
-      status: eliminated ? "eliminated" : statusFor(remaining),
+      /* Nothing matched yet -> always Active, so a short ticket doesn't
+         look "close" before the draw has even started. */
+      status: eliminated ? "eliminated" : (matchedCount === 0 ? "active" : statusFor(remaining)),
       eliminated: eliminated
     };
   }

@@ -154,10 +154,16 @@
             <button class="key" data-digit="9" aria-label="Number 9 was called"><span>9</span></button>
             <button class="key key-zero" data-digit="0" aria-label="Number 0 was called"><span>0</span></button>
           </div>
-          <button class="btn btn-ghost btn-undo" id="btn-undo" disabled>
-            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 3 10l5 5"/><path d="M3 10h11a6 6 0 0 1 0 12h-3"/></svg>
-            Undo last number
-          </button>
+          <div class="draw-actions-row">
+            <button class="btn btn-ghost" id="btn-undo" disabled>
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 3 10l5 5"/><path d="M3 10h11a6 6 0 0 1 0 12h-3"/></svg>
+              Undo
+            </button>
+            <button class="btn btn-ghost" id="btn-new-draw" disabled>
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>
+              New draw
+            </button>
+          </div>
         </div>
       </section>
 

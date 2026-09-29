@@ -140,6 +140,7 @@
   var miniEmpty = $("#mini-empty");
   var keypad = $("#keypad");
   var btnUndo = $("#btn-undo");
+  var btnNewDraw = $("#btn-new-draw");
   var btnUndoHistory = $("#btn-undo-history");
   var btnSoundQuick = $("#btn-sound-quick");
   var demoChip = $("#demo-chip");
@@ -703,6 +704,34 @@
     renderStrip();
     renderMiniList(!!popNew);
     btnUndo.disabled = !hasCalls;
+    btnNewDraw.disabled = !hasCalls;
+  }
+
+  /* Clear the called numbers so the next draw can start. Undoable. */
+  function clearDraw() {
+    if (!state.called.length) return;
+    var previous = state.called.slice();
+    state.called = [];
+    saveState();
+    closeOverlay(winnerOverlay);
+    renderDrawScreen(false);
+    if (!$("#screen-history").hidden) renderHistoryScreen();
+    renderMoreStats();
+    FX.audio.clear();
+    buzz(15);
+    toast("Numbers cleared — ready for the next draw", {
+      variant: "warn",
+      action: "Undo",
+      onAction: function () {
+        // True undo of the clear: the previous round replaces whatever
+        // was entered after it.
+        state.called = previous;
+        saveState();
+        renderDrawScreen(false);
+        if (!$("#screen-history").hidden) renderHistoryScreen();
+        renderMoreStats();
+      }
+    });
   }
 
   function animateBall(d) {
@@ -721,8 +750,20 @@
 
   /* ---------- Draw actions ---------- */
 
+  /* Winners right now, as a comparable signature of ticket ids. */
+  function winnerSignature() {
+    return state.tickets
+      .filter(function (t) {
+        return Lottery.calculateTicketState(t, state.called).status === "winner";
+      })
+      .map(function (t) { return t.id; })
+      .sort()
+      .join(",");
+  }
+
   function callDigit(d) {
     FX.audio.unlock();
+    var beforeWinners = winnerSignature();
     var before = Lottery.summarize(state.tickets, state.called);
     state.called.push(d);
     var after = Lottery.summarize(state.tickets, state.called);
@@ -747,7 +788,9 @@
       FX.audio.oneLeft();
       buzz([40, 60, 40, 60, 90]);
     }
-    if (after.winners > before.winners) celebrate();
+    // Celebrate whenever the winning ticket changes — including a new
+    // ticket taking over from one the draw continued past.
+    if (winnerSignature() !== beforeWinners) celebrate();
   }
 
   function undoCall() {
@@ -974,6 +1017,7 @@
       });
     });
     btnUndo.addEventListener("click", undoCall);
+    btnNewDraw.addEventListener("click", clearDraw);
     btnUndoHistory.addEventListener("click", undoCall);
     btnSoundQuick.addEventListener("click", function () {
       setSound(!state.settings.sound);
@@ -991,13 +1035,7 @@
       if (state.settings.vibration) buzz(30);
     });
     bindTwoTap($("#btn-reset-draw"), function () {
-      state.called = [];
-      saveState();
-      renderDrawScreen(false);
-      renderHistoryScreen();
-      renderMoreStats();
-      renderTicketsScreen();
-      toast("Draw reset — tickets kept", { variant: "warn" });
+      clearDraw();
     });
     bindTwoTap($("#btn-delete-all"), wipeEventData);
 

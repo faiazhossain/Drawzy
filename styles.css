@@ -861,7 +861,13 @@ ol, ul { list-style: none; }
 }
 .key-zero { grid-column: 2; }
 
-.btn-undo { width: 100%; min-height: 44px; padding-block: 6px; font-size: 14px; }
+.draw-actions-row { display: flex; gap: 8px; }
+.draw-actions-row .btn {
+  flex: 1;
+  min-height: 44px;
+  padding-block: 6px;
+  font-size: 14px;
+}
 
 /* ---------- History ---------- */
 
@@ -1183,7 +1189,7 @@ ol, ul { list-style: none; }
   .welcome-ball { font-size: 44px; }
   .welcome-inner { gap: 13px; }
   .keypad { gap: 6px; }
-  .btn-undo { min-height: 40px; }
+  .draw-actions-row .btn { min-height: 40px; }
   .ball-caption { font-size: 10.5px; }
   .strip { min-height: 36px; }
   .strip-item:first-child { height: 42px; }
@@ -1212,7 +1218,7 @@ ol, ul { list-style: none; }
   .strip { min-height: 30px; }
   .strip-item { width: 28px; height: 30px; font-size: 15px; border-radius: 8px; }
   .strip-item:first-child { width: 32px; height: 34px; font-size: 19px; }
-  .btn-undo { min-height: 32px; padding-block: 4px; font-size: 13px; }
+  .draw-actions-row .btn { min-height: 36px; padding-block: 4px; font-size: 13px; }
   .ball-caption { font-size: 9.5px; letter-spacing: 0.12em; }
   .keypad { gap: 5px; }
 }
