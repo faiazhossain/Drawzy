@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0c0a16">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Follow the live lottery draw and track your tickets in real time. Everything stays on your device.">
+  <title>Event Lottery</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23ffc94d'/%3E%3Ccircle cx='24' cy='22' r='9' fill='%23ffe9b0'/%3E%3Ccircle cx='32' cy='32' r='28' fill='none' stroke='%23b97a12' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <h1 class="visually-hidden">Event Lottery</h1>
+
+  <div class="stage-glow" aria-hidden="true"></div>
+  <canvas id="confetti-canvas" class="confetti" aria-hidden="true"></canvas>
+
+  <div class="app">
+    <main class="screens" id="screens">
+
+      <!-- WELCOME -->
+      <section class="screen screen-welcome" id="screen-welcome" hidden aria-labelledby="welcome-title">
+        <div class="welcome-inner">
+          <div class="welcome-art" aria-hidden="true">
+            <span class="welcome-ball">6</span>
+            <span class="welcome-orbit"></span>
+          </div>
+          <p class="eyebrow">Event Lottery</p>
+          <h2 class="welcome-title" id="welcome-title">Ready for<br>the draw?</h2>
+          <p class="welcome-sub">Add your lottery tickets<br>and follow the live numbers.</p>
+          <button class="btn btn-gold btn-xl" id="btn-welcome-start" data-autofocus>Add My Tickets</button>
+          <p class="welcome-note">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="7" rx="2"/><path d="M8 10.5V8m4 9.5V15m4-4.5V8"/></svg>
+            Your tickets stay saved on this device for 7 days.
+          </p>
+        </div>
+      </section>
+
+      <!-- TICKETS -->
+      <section class="screen screen-tickets" id="screen-tickets" hidden aria-labelledby="tickets-title">
+        <header class="screen-head">
+          <div>
+            <p class="eyebrow">Your entry</p>
+            <h2 id="tickets-title">My Tickets</h2>
+          </div>
+          <span class="count-chip" id="ticket-count-chip">0</span>
+        </header>
+
+        <div class="add-card">
+          <label class="field-label" for="ticket-input">Add a ticket number</label>
+          <div class="add-row">
+            <input id="ticket-input" class="field" type="text" inputmode="numeric" autocomplete="off"
+                   autocorrect="off" spellcheck="false" placeholder="161648" maxlength="12" enterkeyhint="done">
+            <button class="btn btn-gold" id="btn-add-ticket">
+              <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              Add
+            </button>
+          </div>
+          <p class="field-error" id="field-error" role="alert" hidden></p>
+          <button class="link-btn" id="btn-toggle-bulk" aria-expanded="false" aria-controls="bulk-panel">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="7" width="12" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>
+            Paste a list of tickets
+          </button>
+
+          <div class="bulk" id="bulk-panel" hidden>
+            <label class="field-label" for="bulk-input">One ticket per line, or separated by commas</label>
+            <textarea id="bulk-input" class="field textarea" rows="5" spellcheck="false"
+                      placeholder="161648&#10;927315&#10;481623"></textarea>
+            <div class="bulk-summary" id="bulk-summary" hidden></div>
+            <ul class="bulk-preview" id="bulk-preview" hidden></ul>
+            <div class="bulk-actions">
+              <button class="btn btn-gold" id="btn-bulk-add" disabled>Add tickets</button>
+              <button class="btn btn-ghost" id="btn-bulk-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <ul class="ticket-list" id="ticket-list"></ul>
+
+        <div class="empty" id="tickets-empty">
+          <span class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 0 0 8v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1z"/><path d="M13 5v2m0 3v2m0 3v2" stroke-dasharray="0.1 3.4"/></svg>
+          </span>
+          <h3>Your tickets are waiting</h3>
+          <p>Add your first ticket and get ready for the draw.</p>
+        </div>
+
+        <div class="screen-footer">
+          <button class="btn btn-danger-ghost two-tap" id="btn-clear-all">Clear all</button>
+          <button class="btn btn-gold btn-xl" id="btn-start-draw">
+            Start the Draw
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- DRAW -->
+      <section class="screen screen-draw" id="screen-draw" hidden aria-labelledby="draw-title">
+        <header class="draw-head">
+          <div class="live-badge">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span id="draw-title">Live Draw</span>
+            <span class="demo-chip" id="demo-chip" hidden>Demo</span>
+          </div>
+          <button class="icon-btn" id="btn-sound-quick" aria-pressed="true" aria-label="Sound is on">
+            <svg class="ic ic-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><path d="M15 9.5a4 4 0 0 1 0 5M17.5 7a7.5 7.5 0 0 1 0 10"/></svg>
+            <svg class="ic ic-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><path d="m16 9.5 5 5m0-5-5 5"/></svg>
+          </button>
+        </header>
+
+        <div class="draw-stage">
+          <div class="ball-wrap">
+            <span class="ring" id="ball-ring" aria-hidden="true"></span>
+            <div class="ball" id="ball"><span id="ball-digit">&ndash;</span></div>
+          </div>
+          <p class="ball-caption" id="ball-caption">Tap each number as it is announced</p>
+        </div>
+
+        <div class="banner lv-neutral" id="banner" aria-live="polite" aria-atomic="true">
+          <span class="banner-emoji" id="banner-emoji" aria-hidden="true">&#127922;</span>
+          <div class="banner-text">
+            <strong id="banner-title">Ready to play</strong>
+            <span id="banner-sub">Tap numbers below as you hear them</span>
+          </div>
+        </div>
+
+        <div class="strip-wrap">
+          <p class="strip-label" aria-hidden="true">Called</p>
+          <ol class="strip" id="strip"></ol>
+        </div>
+
+        <div class="draw-tickets" id="draw-tickets">
+          <ol class="mini-list" id="mini-list"></ol>
+          <div class="mini-empty" id="mini-empty">
+            <p>No tickets yet.</p>
+            <button class="link-btn" id="btn-mini-add">Add tickets</button>
+          </div>
+        </div>
+
+        <div class="draw-controls">
+          <div class="keypad" id="keypad" role="group" aria-label="Called number pad">
+            <button class="key" data-digit="1" aria-label="Number 1 was called"><span>1</span></button>
+            <button class="key" data-digit="2" aria-label="Number 2 was called"><span>2</span></button>
+            <button class="key" data-digit="3" aria-label="Number 3 was called"><span>3</span></button>
+            <button class="key" data-digit="4" aria-label="Number 4 was called"><span>4</span></button>
+            <button class="key" data-digit="5" aria-label="Number 5 was called"><span>5</span></button>
+            <button class="key" data-digit="6" aria-label="Number 6 was called"><span>6</span></button>
+            <button class="key" data-digit="7" aria-label="Number 7 was called"><span>7</span></button>
+            <button class="key" data-digit="8" aria-label="Number 8 was called"><span>8</span></button>
+            <button class="key" data-digit="9" aria-label="Number 9 was called"><span>9</span></button>
+            <button class="key key-zero" data-digit="0" aria-label="Number 0 was called"><span>0</span></button>
+          </div>
+          <button class="btn btn-ghost btn-undo" id="btn-undo" disabled>
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 3 10l5 5"/><path d="M3 10h11a6 6 0 0 1 0 12h-3"/></svg>
+            Undo last number
+          </button>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="screen screen-history" id="screen-history" hidden aria-labelledby="history-title">
+        <header class="screen-head">
+          <div>
+            <p class="eyebrow">So far</p>
+            <h2 id="history-title">Called Numbers</h2>
+          </div>
+          <span class="count-chip" id="history-count-chip">0</span>
+        </header>
+        <p class="history-sub">Newest first. Undo restores the draw to exactly before that call.</p>
+        <ol class="history-grid" id="history-grid"></ol>
+        <div class="empty" id="history-empty">
+          <span class="empty-art" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          </span>
+          <h3>No numbers called yet</h3>
+          <p>Every number from the live draw will land here.</p>
+          <button class="btn btn-ghost" id="btn-history-goto-draw">Go to the Draw</button>
+        </div>
+        <div class="screen-footer">
+          <button class="btn btn-ghost btn-xl" id="btn-undo-history" disabled>
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5 3 10l5 5"/><path d="M3 10h11a6 6 0 0 1 0 12h-3"/></svg>
+            Undo last number
+          </button>
+        </div>
+      </section>
+
+      <!-- MORE -->
+      <section class="screen screen-more" id="screen-more" hidden aria-labelledby="more-title">
+        <header class="screen-head">
+          <div>
+            <p class="eyebrow">Controls</p>
+            <h2 id="more-title">Settings</h2>
+          </div>
+        </header>
+
+        <div class="card">
+          <p class="card-label">Feedback</p>
+          <div class="row">
+            <div class="row-text">
+              <span class="row-title">Sound effects</span>
+              <span class="row-sub">Gentle chimes for calls and wins</span>
+            </div>
+            <button class="switch" id="sw-sound" role="switch" aria-checked="true" aria-label="Sound effects">
+              <span class="knob"></span>
+            </button>
+          </div>
+          <div class="row">
+            <div class="row-text">
+              <span class="row-title">Vibration</span>
+              <span class="row-sub">Buzz on calls, wins and near misses</span>
+            </div>
+            <button class="switch" id="sw-vibration" role="switch" aria-checked="true" aria-label="Vibration">
+              <span class="knob"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-label">Your data</p>
+          <div class="stat-row"><span>Tickets</span><strong id="more-tickets-count">0</strong></div>
+          <div class="stat-row"><span>Numbers called</span><strong id="more-calls-count">0</strong></div>
+          <div class="stat-row"><span>Last saved</span><strong id="more-saved">Just now</strong></div>
+          <p class="card-note" id="more-storage-note">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v5c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6z"/></svg>
+            Everything is stored only on this device and expires 7 days after your last visit.
+          </p>
+          <div class="danger-actions">
+            <button class="btn btn-danger-ghost two-tap" id="btn-reset-draw">Reset draw</button>
+            <button class="btn btn-danger-ghost two-tap" id="btn-delete-all">Delete everything</button>
+          </div>
+        </div>
+
+        <p class="more-footer">Event Lottery &middot; works offline &middot; no account needed</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Main" hidden>
+      <button class="nav-btn" data-tab="draw">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6"/></svg>
+        <span>Draw</span>
+      </button>
+      <button class="nav-btn" data-tab="tickets">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 0 0 8v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1z"/><path d="M13 5v2m0 3v2m0 3v2"/></svg>
+        <span>Tickets</span>
+      </button>
+      <button class="nav-btn" data-tab="history">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3.5 2"/></svg>
+        <span>History</span>
+      </button>
+      <button class="nav-btn" data-tab="more">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 12h2M10 12h10M4 17h10M18 17h2"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="16" cy="17" r="2"/></svg>
+        <span>More</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- WINNER OVERLAY -->
+  <div class="overlay" id="winner-overlay" role="dialog" aria-modal="true" aria-labelledby="winner-title" hidden>
+    <div class="overlay-scrim" data-close></div>
+    <div class="winner-card">
+      <p class="winner-kicker" aria-hidden="true">&#127881; &#127881; &#127881;</p>
+      <h2 class="winner-title" id="winner-title">YOU WON!</h2>
+      <div class="winner-tickets" id="winner-tickets"></div>
+      <p class="winner-sub" id="winner-sub"></p>
+      <div class="overlay-actions">
+        <button class="btn btn-gold btn-xl" id="btn-winner-continue" data-autofocus>Keep Going</button>
+        <button class="btn btn-ghost" id="btn-winner-tickets">See My Tickets</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPIRY OVERLAY -->
+  <div class="overlay" id="expiry-overlay" role="dialog" aria-modal="true" aria-labelledby="expiry-title" hidden>
+    <div class="overlay-scrim"></div>
+    <div class="dialog-card">
+      <span class="dialog-art" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+      </span>
+      <h2 id="expiry-title">Your previous event data has expired</h2>
+      <p>Tickets and called numbers are kept for 7 days. Would you like to start a new draw?</p>
+      <div class="overlay-actions">
+        <button class="btn btn-gold btn-xl" id="btn-expiry-fresh" data-autofocus>Start Fresh</button>
+        <button class="btn btn-ghost" id="btn-expiry-keep">Keep This Event</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <noscript><p class="noscript">Event Lottery needs JavaScript to run. Please enable it and reload.</p></noscript>
+
+  <script src="./lottery.js"></script>
+  <script src="./effects.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
