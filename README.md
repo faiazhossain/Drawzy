@@ -12,7 +12,7 @@ Built for ~150 simultaneous users at a live event. No backend, no accounts.
 - Plain HTML / CSS / vanilla JS (three files, no build step)
 - `localStorage` persistence with a 7-day expiry
 - Generated sounds (Web Audio), vibration, confetti, screen wake lock
-- Service worker for offline use after first load
+- Service worker: network-first reloads; cache only as offline fallback
 - Deploys as a static site (Vercel: import the folder, zero config)
 
 ## Structure

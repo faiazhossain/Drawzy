@@ -1,5 +1,7 @@
-/* Simple offline cache: app shell is served cache-first after first load. */
-var VERSION = "event-lottery-v1";
+/* Offline support: while online every load fetches the latest deploy from the
+   network; the cache is only a fallback for when the network is unreachable.
+   Tickets live in localStorage, which the service worker never touches. */
+var VERSION = "event-lottery-v2";
 var ASSETS = [
   "./",
   "./index.html",
@@ -28,17 +30,19 @@ self.addEventListener("activate", function (e) {
   );
 });
 
+/* Network-first: reloads always see the newest deploy while online.
+   Only when the network fails do we serve the cached copy. */
 self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET") return;
   e.respondWith(
-    caches.match(req).then(function (hit) {
-      if (hit) return hit;
-      return fetch(req).then(function (res) {
-        var copy = res.clone();
-        caches.open(VERSION).then(function (c) { return c.put(req, copy); }).catch(function () {});
-        return res;
-      }).catch(function () {
+    fetch(req).then(function (res) {
+      var copy = res.clone();
+      caches.open(VERSION).then(function (c) { return c.put(req, copy); }).catch(function () {});
+      return res;
+    }).catch(function () {
+      return caches.match(req).then(function (hit) {
+        if (hit) return hit;
         if (req.mode === "navigate") return caches.match("./index.html");
         return Promise.reject(new Error("offline"));
       });
