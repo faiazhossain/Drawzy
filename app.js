@@ -56,7 +56,8 @@
       savedAt: 0,
       welcomeSeen: false,
       tab: "tickets",
-      savedNoteShown: false
+      savedNoteShown: false,
+      scanFormat: ""
     };
   }
 
@@ -83,7 +84,10 @@
         savedAt: typeof data.savedAt === "number" ? data.savedAt : 0,
         welcomeSeen: !!data.welcomeSeen,
         tab: TABS.indexOf(data.tab) !== -1 ? data.tab : "tickets",
-        savedNoteShown: !!data.savedNoteShown
+        savedNoteShown: !!data.savedNoteShown,
+        scanFormat: typeof data.scanFormat === "string" && /^\d{1,2}$/.test(data.scanFormat)
+          ? data.scanFormat
+          : ""
       };
     } catch (e) { return fresh; }
   }
@@ -165,6 +169,7 @@
 
   var winnerOverlay = $("#winner-overlay");
   var expiryOverlay = $("#expiry-overlay");
+  var scanOverlay = $("#scan-overlay");
   var winnerTickets = $("#winner-tickets");
   var winnerSub = $("#winner-sub");
   var toastRegion = $("#toast-region");
@@ -270,10 +275,12 @@
   }
 
   document.addEventListener("keydown", function (e) {
-    var open = [winnerOverlay, expiryOverlay].filter(function (o) { return !o.hidden; })[0];
+    var open = [winnerOverlay, expiryOverlay, scanOverlay].filter(function (o) { return !o.hidden; })[0];
     if (!open) return;
-    if (e.key === "Escape" && open === winnerOverlay) {
-      closeOverlay(winnerOverlay);
+    /* Escape closes these two; the expiry prompt needs an explicit choice. */
+    if (e.key === "Escape" && open !== expiryOverlay) {
+      if (open === scanOverlay) closeScan();
+      else closeOverlay(winnerOverlay);
       return;
     }
     if (e.key === "Tab") {
@@ -591,6 +598,40 @@
     renderMoreStats();
     FX.audio.close();
     toast("Added " + plural(pendingBulk.valid.length, "ticket") + (note.length ? " · " + note.join(", ") : ""));
+  }
+
+  /* ---------- Scan entry (OCR in scan.js) ---------- */
+
+  function openScan() {
+    openOverlay(scanOverlay);
+    Scan.open({
+      existing: existingNums(),
+      initialFormat: state.scanFormat,
+      onAdd: addScannedTickets,
+      onClose: closeScan,
+      toast: toast
+    });
+  }
+
+  function closeScan() {
+    Scan.close();
+    closeOverlay(scanOverlay);
+  }
+
+  function addScannedTickets(nums, format) {
+    if (!nums.length) return;
+    nums.forEach(function (num) {
+      state.tickets.push({ id: uid(), num: num });
+    });
+    if (format) {
+      state.scanFormat = format;
+    }
+    saveState();
+    renderTicketsScreen();
+    renderMiniList(false);
+    renderMoreStats();
+    FX.audio.close();
+    toast("Added " + plural(nums.length, "ticket"));
   }
 
   /* ---------- Rendering: draw screen ---------- */
@@ -1004,6 +1045,9 @@
       bulkPanel.hidden = true;
       $("#btn-toggle-bulk").setAttribute("aria-expanded", "false");
     });
+
+    // Tickets: photo scan (OCR)
+    $("#btn-open-scan").addEventListener("click", openScan);
 
     bindTwoTap($("#btn-clear-all"), function () {
       state.tickets = [];

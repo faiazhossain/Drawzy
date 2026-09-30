@@ -65,6 +65,10 @@
             <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="7" width="12" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>
             Paste a list of tickets
           </button>
+          <button class="link-btn" id="btn-open-scan">
+            <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M4 12h16"/></svg>
+            Scan ticket photos
+          </button>
 
           <div class="bulk" id="bulk-panel" hidden>
             <label class="field-label" for="bulk-input">One ticket per line, or separated by commas</label>
@@ -295,12 +299,72 @@
     </div>
   </div>
 
+  <!-- SCAN OVERLAY -->
+  <div class="overlay" id="scan-overlay" role="dialog" aria-modal="true" aria-labelledby="scan-title" hidden>
+    <div class="overlay-scrim" data-close-scan></div>
+    <div class="scan-card">
+      <header class="scan-head">
+        <h2 id="scan-title">Scan Tickets</h2>
+        <button class="icon-btn" id="btn-scan-close" aria-label="Close scanner">
+          <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </header>
+
+      <!-- Step 1: number format -->
+      <div class="scan-step" id="scan-step-format">
+        <div>
+          <label class="field-label" for="scan-format">How many digits is one ticket number?</label>
+          <input id="scan-format" class="field" type="text" inputmode="numeric" autocomplete="off"
+                 autocorrect="off" spellcheck="false" placeholder="6" maxlength="2" data-autofocus>
+        </div>
+        <p class="field-error" id="scan-format-error" role="alert" hidden></p>
+        <p class="scan-hint">
+          Any number with that many digits gets picked up — 161642, 131314, anything.
+          You can remove wrong ones before adding.
+        </p>
+        <div class="overlay-actions">
+          <button class="btn btn-gold btn-xl" id="btn-scan-choose" disabled>Choose Photos</button>
+          <button class="btn btn-ghost btn-xl" id="btn-scan-camera" disabled>Take Photos</button>
+        </div>
+      </div>
+
+      <!-- Step 2: photos -->
+      <div class="scan-step" id="scan-step-photos" hidden>
+        <p class="scan-hint">Matching <strong id="scan-pattern-label" class="scan-pattern"></strong></p>
+        <ul class="scan-thumbs" id="scan-thumbs"></ul>
+        <div class="overlay-actions">
+          <button class="btn btn-gold btn-xl" id="btn-scan-run" disabled>Scan Photos</button>
+          <button class="btn btn-ghost" id="btn-scan-add-more">Add More Photos</button>
+          <button class="btn btn-ghost" id="btn-scan-edit-format">Change Format</button>
+        </div>
+      </div>
+
+      <!-- Step 3: progress and review -->
+      <div class="scan-step" id="scan-step-review" hidden>
+        <div id="scan-progress" hidden>
+          <div class="scan-bar" role="presentation"><div class="scan-bar-fill" id="scan-bar-fill"></div></div>
+          <p class="scan-progress-text" id="scan-progress-text" role="status" aria-live="polite"></p>
+        </div>
+        <div class="bulk-summary" id="scan-summary" hidden></div>
+        <ul class="bulk-preview" id="scan-preview" hidden></ul>
+        <div class="overlay-actions">
+          <button class="btn btn-gold btn-xl" id="btn-scan-add" disabled>Add Tickets</button>
+          <button class="btn btn-ghost" id="btn-scan-back">Scan More Photos</button>
+        </div>
+      </div>
+
+      <input type="file" id="scan-file-input" accept="image/*" multiple hidden>
+      <input type="file" id="scan-camera-input" accept="image/*" capture="environment" multiple hidden>
+    </div>
+  </div>
+
   <div class="toast-region" id="toast-region" aria-live="polite"></div>
 
   <noscript><p class="noscript">Event Lottery needs JavaScript to run. Please enable it and reload.</p></noscript>
 
   <script src="./lottery.js"></script>
   <script src="./effects.js"></script>
+  <script src="./scan.js"></script>
   <script src="./app.js"></script>
 </body>
 </html>

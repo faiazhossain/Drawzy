@@ -9,9 +9,11 @@ Built for ~150 simultaneous users at a live event. No backend, no accounts.
 
 ## Stack
 
-- Plain HTML / CSS / vanilla JS (three files, no build step)
+- Plain HTML / CSS / vanilla JS (no build step)
 - `localStorage` persistence with a 7-day expiry
 - Generated sounds (Web Audio), vibration, confetti, screen wake lock
+- Ticket photos can be OCR-scanned on-device (Tesseract.js from CDN — needs
+  network the first time; everything else works offline)
 - Service worker: network-first reloads; cache only as offline fallback
 - Deploys as a static site (Vercel: import the folder, zero config)
 
@@ -21,10 +23,11 @@ Built for ~150 simultaneous users at a live event. No backend, no accounts.
 index.html   markup and screens
 styles.css   all styling (mobile-first, 320px and up)
 lottery.js   lottery rules only — matching, statuses, parsing
+scan.js      ticket-photo OCR — format parsing, number extraction, Tesseract pipeline
 effects.js   sound, haptics, confetti, wake lock
 app.js       state, storage, routing, rendering
 sw.js        offline cache
-test/        rules tests (node --test test/)
+test/        rules tests (node --test)
 ```
 
 ## Changing the lottery rules

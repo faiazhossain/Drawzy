@@ -1,13 +1,14 @@
 /* Offline support: while online every load fetches the latest deploy from the
    network; the cache is only a fallback for when the network is unreachable.
    Tickets live in localStorage, which the service worker never touches. */
-var VERSION = "event-lottery-v2";
+var VERSION = "event-lottery-v5";
 var ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./lottery.js",
   "./effects.js",
+  "./scan.js",
   "./app.js"
 ];
 
